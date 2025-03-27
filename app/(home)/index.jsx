@@ -1,3 +1,6 @@
+// https://github.com/expo/expo/issues/23104#issuecomment-1689566248
+import '@expo/metro-runtime';
+import '@/assets/css/global.css';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { styles, colors } from '@/app/_layout';
 import { useState, useEffect } from 'react';
@@ -21,11 +24,13 @@ export default function Home() {
         'text'
     );
     // Test fetches by using local JSON files to avoid increasing GitHUB REST API rate limit.
-    const mockFetch = false;
+    const mockFetch = true;
     // Inserts default values for form fields for quick testing.
     const mockForms = false;
     // Alternate between pretend repositories.
     const mockReleases = 0;
+    // Log form field changes.
+    const mockFormChangesLogs = true;
     const [formOwner, setFormOwner] = useState(
         mockFetch || mockForms
             ? mockReleases === 0
@@ -203,12 +208,15 @@ export default function Home() {
             ? `${diffSeconds(d1, d2)} seconds ago`
             : '';
     };
-    const getWord = (url, start, end) => {
-        const min = url.indexOf(start) + start.length;
-        const max = url.indexOf(end, min);
+    const getWord = (url, start, end) =>
+        !mockFetch
+            ? (() => {
+                  const min = url.indexOf(start) + start.length;
+                  const max = url.indexOf(end, min);
 
-        return url.substring(min, max);
-    };
+                  return url.substring(min, max);
+              })()
+            : undefined;
 
     useEffect(() => {
         mockFetch ? fetchInit() : undefined;
@@ -219,13 +227,17 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        console.log(formOwner);
-        console.log(formRepository);
+        mockFormChangesLogs
+            ? (console.log(formOwner), console.log(formRepository))
+            : undefined;
     }, [formOwner, formRepository]);
 
     return (
         <ThemedView style={styles.rootContainer}>
             <ScrollView contentContainerStyle={styles.rootSubContainer}>
+                {/* <View className='bg-blue-600'>
+                    <Text style={{ color: 'red' }}>abc</Text>
+                </View> */}
                 <View style={styles.headingTitleGroup}>
                     <Text
                         style={{

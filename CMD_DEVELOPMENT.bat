@@ -6,7 +6,7 @@ ECHO 1 - [ web ]
 ECHO 2 - [ android ]
 ECHO 3 - [ ios ]
 ECHO 4 - [ lint ]
-ECHO 5 - [ register ]
+ECHO 5 - [ update dependencies ]
 ECHO ----
 
 SET /P input="ENTER: "
@@ -32,7 +32,7 @@ IF %input% == 4 (
 )
 
 IF %input% == 5 (
-    CALL npm run register
+    CALL npm run update-dependencies
 )
 
 ECHO ----
