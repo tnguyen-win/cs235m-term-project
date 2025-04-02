@@ -1,36 +1,30 @@
-// https://github.com/expo/expo/issues/23104#issuecomment-1689566248
-import '@expo/metro-runtime';
-import '@/assets/css/global.css';
-import { useThemeColor } from '@/hooks/useThemeColor';
-import { styles, colors } from '@/app/_layout';
+import { defaultClasses, colors } from '@/app/_layout';
 import { useState, useEffect } from 'react';
 import DummyDataGodot from '@/data/dummy_data_godot.json';
 import DummyDataBabylonJS from '@/data/dummy_data_babylonjs.json';
 import { useRouter } from 'expo-router';
+import { useColorScheme } from 'nativewind';
 import {
-    View,
     ScrollView,
+    View,
     Text,
     TextInput,
+    Switch,
+    Platform,
     TouchableOpacity
 } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
 import Release from '@/components/Release';
 
 export default function Home() {
-    const themedColor = useThemeColor(
-        { light: colors.black, dark: colors.white },
-        'text'
-    );
-    // Test fetches by using local JSON files to avoid increasing GitHUB REST API rate limit.
-    const mockFetch = true;
-    // Inserts default values for form fields for quick testing.
-    const mockForms = false;
-    // Alternate between pretend repositories.
-    const mockReleases = 0;
-    // Log form field changes.
-    const mockFormChangesLogs = true;
+    const {
+        colorScheme: getTheme,
+        setColorScheme: _,
+        toggleColorScheme
+    } = useColorScheme();
+    const mockFetch = false; // INFO - Test fetches by using local JSON files to avoid increasing GitHUB REST API rate limit.
+    const mockForms = false; // INFO - Inserts default values for form fields for quick testing.
+    const mockReleases = 0; // INFO - Alternate between pretend repositories.
+    const mockFormChangesLogs = true; // Log form field changes.
     const [formOwner, setFormOwner] = useState(
         mockFetch || mockForms
             ? mockReleases === 0
@@ -71,7 +65,10 @@ export default function Home() {
           )
         : undefined;
 
+    // WIP - Figure out way to pass theme between _layout.jsx and index.jsx.
+    const handleOnToggle = () => toggleColorScheme();
     const handleOnSubmit = () => {
+        // WIP - Add system to check if offline.
         switch (true) {
             case formOwner === '':
             case formRepository === '':
@@ -141,7 +138,7 @@ export default function Home() {
         setFormOwner('');
         setFormRepository('');
     };
-    // Source for date diff algorithms - https://javascript.plainenglish.io/find-difference-between-dates-in-javascript-80d9280d8598
+    // INFO - Source for date diff algorithms - https://javascript.plainenglish.io/find-difference-between-dates-in-javascript-80d9280d8598
     const calculateElapsedTime = date => {
         const diffMonths = (d1, d2) => {
             const date1 = new Date(d1);
@@ -220,10 +217,6 @@ export default function Home() {
 
     useEffect(() => {
         mockFetch ? fetchInit() : undefined;
-
-        typeof document !== 'undefined'
-            ? (document.title = 'GH Replicate')
-            : undefined;
     }, []);
 
     useEffect(() => {
@@ -233,61 +226,77 @@ export default function Home() {
     }, [formOwner, formRepository]);
 
     return (
-        <ThemedView style={styles.rootContainer}>
-            <ScrollView contentContainerStyle={styles.rootSubContainer}>
-                {/* <View className='bg-blue-600'>
-                    <Text style={{ color: 'red' }}>abc</Text>
-                </View> */}
-                <View style={styles.headingTitleGroup}>
-                    <Text
-                        style={{
-                            color: themedColor,
-                            ...styles.headingTitleText
-                        }}>
-                        GH REPLICATE
-                    </Text>
-                </View>
-                <View style={styles.headingTitleLine} />
-                <View style={styles.formGroup}>
-                    <ThemedText style={styles.formLabel}>Owner</ThemedText>
+        // WORKAROUND - Style inheritance doesn't work in Nativewind: https://www.nativewind.dev/guides/troubleshooting#colors-are-not-working
+        <ScrollView className='bg-white dark:bg-[#09090b]'>
+            <View className='container mx-auto px-4 py-32 lg:px-0 lg:py-16 gap-4'>
+                <Text className={defaultClasses.textTitle}>GH REPLICATE</Text>
+                {/* WIP - Figure out way to make parent change opacity on switch child press. */}
+                <TouchableOpacity
+                    className='gap-2 ms-auto -m-4 p-4'
+                    onPress={handleOnToggle}>
+                    {/*
+                        WIP - Convert to use icon.
+
+                        WIP - Figure out how to implement smooth transitions.
+                    */}
+                    <Text className={defaultClasses.textTheme}>Dark Theme</Text>
+                    <Switch
+                        className='ms-auto'
+                        trackColor={{
+                            true: '#262629',
+                            false: '#e3e3e6'
+                        }}
+                        activeThumbColor={
+                            getTheme === 'dark' ? 'white' : '#09090b'
+                        } // Workaround for web.
+                        thumbColor={getTheme === 'dark' ? 'white' : '#09090b'}
+                        onChange={handleOnToggle}
+                        value={getTheme === 'dark' ? true : false}
+                    />
+                </TouchableOpacity>
+                {/* WIP - Convert form text + input fields to component. */}
+                <View className='gap-2'>
+                    <Text className={defaultClasses.textLabel}>Owner</Text>
                     <TextInput
-                        keyboardType='default'
+                        className={`${defaultClasses.formInput}`}
+                        keyboardType='url'
                         onSubmitEditing={handleOnSubmit}
+                        onChangeText={setFormOwner}
                         value={formOwner}
-                        onChangeText={newText => setFormOwner(newText)}
+                        allowFontScaling={false}
+                        autoCapitalize='none'
                         autoCorrect={false}
                         spellCheck={false}
-                        placeholder='e.g. godotengine'
+                        importantForAutofill='no'
+                        placeholder='godotengine'
                         placeholderTextColor={colors.gray}
-                        style={{
-                            ...styles.formInput,
-                            color: themedColor
-                        }}
                     />
                 </View>
-                <View style={styles.formGroup}>
-                    <ThemedText style={styles.formLabel}>Repository</ThemedText>
+                <View className='gap-2'>
+                    <Text className={defaultClasses.textLabel}>Repository</Text>
                     <TextInput
-                        keyboardType='default'
+                        className={`${defaultClasses.formInput}`}
+                        keyboardType='url'
                         onSubmitEditing={handleOnSubmit}
+                        onChangeText={setFormRepository}
                         value={formRepository}
-                        onChangeText={newText => setFormRepository(newText)}
+                        allowFontScaling={false}
+                        autoCapitalize='none'
                         autoCorrect={false}
                         spellCheck={false}
-                        placeholder='e.g. godot'
+                        importantForAutofill='no'
+                        placeholder='godot'
                         placeholderTextColor={colors.gray}
-                        style={{
-                            ...styles.formInput,
-                            color: themedColor
-                        }}
                     />
                 </View>
                 <TouchableOpacity
-                    style={styles.buttonContainer}
+                    className='bg-[#09090b] dark:bg-white border border-[#09090b] dark:bg-white rounded-md p-2'
                     onPress={handleOnSubmit}>
-                    <Text style={styles.formButtonText}>SUBMIT</Text>
+                    <Text className='font-geist font-semibold text-center text-white dark:text-black'>
+                        Submit
+                    </Text>
                 </TouchableOpacity>
-                <View style={styles.releasesContainer}>
+                <View className='mt-8'>
                     {jsonData
                         ? jsonData.map(res => {
                               const id = res.id.toString();
@@ -307,7 +316,7 @@ export default function Home() {
                               return (
                                   <Release
                                       key={id}
-                                      themedColor={themedColor}
+                                      themedColor={getTheme}
                                       date={calculateElapsedTime(
                                           res.created_at
                                       )}
@@ -332,7 +341,7 @@ export default function Home() {
                           })
                         : undefined}
                 </View>
-            </ScrollView>
-        </ThemedView>
+            </View>
+        </ScrollView>
     );
 }

@@ -1,7 +1,7 @@
 {
     "expo": {
-        "name": "cs135m-term-project",
-        "slug": "cs135m-term-project",
+        "name": "cs235m-term-project",
+        "slug": "cs235m-term-project",
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
@@ -31,6 +31,12 @@
                     "imageWidth": 200,
                     "resizeMode": "contain",
                     "backgroundColor": "#ffffff"
+                }
+            ],
+            [
+                "expo-font",
+                {
+                    "fonts": ["./assets/fonts/Geist-VariableFont_wght.ttf"]
                 }
             ]
         ],
