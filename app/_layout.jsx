@@ -1,7 +1,6 @@
 import '@expo/metro-runtime'; // WORKAROUND - For web: https://github.com/expo/expo/issues/23104#issuecomment-1689566248
 import '@/assets/css/global.css';
 import { useColorScheme } from 'nativewind';
-import { Platform } from 'react-native';
 import { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';

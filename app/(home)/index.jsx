@@ -9,18 +9,14 @@ import {
     View,
     Text,
     TextInput,
-    Switch,
-    Platform,
-    TouchableOpacity
+    TouchableOpacity,
+    Switch
 } from 'react-native';
 import Release from '@/components/Release';
 
 export default function Home() {
-    const {
-        colorScheme: getTheme,
-        setColorScheme: _,
-        toggleColorScheme
-    } = useColorScheme();
+    const { colorScheme: getTheme, setColorScheme: setTheme } =
+        useColorScheme();
     const mockFetch = false; // INFO - Test fetches by using local JSON files to avoid increasing GitHUB REST API rate limit.
     const mockForms = false; // INFO - Inserts default values for form fields for quick testing.
     const mockReleases = 0; // INFO - Alternate between pretend repositories.
@@ -65,8 +61,13 @@ export default function Home() {
           )
         : undefined;
 
-    // WIP - Figure out way to pass theme between _layout.jsx and index.jsx.
-    const handleOnToggle = () => toggleColorScheme();
+    /*
+        WIP - Figure out way to pass theme between _layout.jsx and index.jsx.
+
+        WORKAROUND - Use "setColorScheme" instead of "toggleColorScheme" to avoid possible infinite loop with switch toggle.
+    */
+    const handleOnToggle = () =>
+        setTheme(getTheme === 'dark' ? 'light' : 'dark');
     const handleOnSubmit = () => {
         // WIP - Add system to check if offline.
         switch (true) {
@@ -230,9 +231,9 @@ export default function Home() {
         <ScrollView className='bg-white dark:bg-[#09090b]'>
             <View className='container mx-auto px-4 py-32 lg:px-0 lg:py-16 gap-4'>
                 <Text className={defaultClasses.textTitle}>GH REPLICATE</Text>
-                {/* WIP - Figure out way to make parent change opacity on switch child press. */}
                 <TouchableOpacity
                     className='gap-2 ms-auto -m-4 p-4'
+                    activeOpacity={0.0}
                     onPress={handleOnToggle}>
                     {/*
                         WIP - Convert to use icon.
@@ -248,9 +249,9 @@ export default function Home() {
                         }}
                         activeThumbColor={
                             getTheme === 'dark' ? 'white' : '#09090b'
-                        } // Workaround for web.
+                        } // WORKAROUND - For web.
                         thumbColor={getTheme === 'dark' ? 'white' : '#09090b'}
-                        onChange={handleOnToggle}
+                        onChange={handleOnToggle} // INFO - Doesn't work on web.
                         value={getTheme === 'dark' ? true : false}
                     />
                 </TouchableOpacity>
