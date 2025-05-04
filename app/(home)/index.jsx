@@ -269,7 +269,7 @@ export default function Home() {
                         autoCorrect={false}
                         spellCheck={false}
                         importantForAutofill='no'
-                        placeholder='godotengine'
+                        placeholder='e.g. godotengine'
                         placeholderTextColor={colors.gray}
                     />
                 </View>
@@ -286,7 +286,7 @@ export default function Home() {
                         autoCorrect={false}
                         spellCheck={false}
                         importantForAutofill='no'
-                        placeholder='godot'
+                        placeholder='e.g. godot'
                         placeholderTextColor={colors.gray}
                     />
                 </View>
