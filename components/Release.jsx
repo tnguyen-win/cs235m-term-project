@@ -1,4 +1,4 @@
-import { rootClasses } from '@/app/_layout';
+import { defaultClasses, rootClasses } from '@/app/_layout';
 import { Text, View, Platform, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { SvgXml } from 'react-native-svg';
@@ -21,6 +21,10 @@ export default function Release({
     downloadAbleZipBall,
     downloadAbleTarBall
 }) {
+    // INFO - Default styles: https://github.com/iamacup/react-native-markdown-display/blob/master/src/lib/styles.js
+    const stylesMarkdown = {
+        link: {}
+    };
     // INFO - Supported elements: https://github.com/iamacup/react-native-markdown-display/blob/master/src/lib/renderRules.js
     const rulesMarkdown = {
         body: (node, children, _, styles) => (
@@ -101,38 +105,49 @@ export default function Release({
                 </View>
             );
         },
-
-        link: (node, children, _, _styles) => {
-            return (
-                <Text
-                    key={node.key}
-                    className={rootClasses.link}
-                    style={_styles.link}
-                    href={node.attributes.href}>
-                    {children}
-                </Text>
-            );
-        }
+        link: (node, children, _, _styles) => (
+            <Link
+                key={node.key}
+                className={rootClasses.link}
+                style={_styles.link}
+                href={node.attributes.href}>
+                {children}
+            </Link>
+        )
     };
+    // // INFO - Disclaimer, this REGEX was constructed using artificial intelligence.
+    const matches = changelog?.match(
+        / https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}(\/[\w\-./…]*)?/g
+    );
+
+    matches
+        ? matches?.map(e => {
+              e = e.trim();
+
+              changelog = changelog?.replaceAll(e, ` [${e}](${e})`);
+          })
+        : changelog;
 
     return (
-        <View className={`lg:flex-row gap-8${latestLink ? '' : ' mt-8'}`}>
+        <View className={`xl:flex-row gap-8${latestLink ? '' : ' mt-8'}`}>
             {/* INFO - Left row. */}
-            <View className='flex-row lg:flex-col items-center lg:items-start justify-center lg:justify-start gap-4 lg:gap-2 lg:mt-8'>
+            <View className='flex-row md:flex-col items-center md:items-start justify-center md:justify-start gap-4 md:gap-2 md:mt-8'>
                 <Text className={rootClasses.text}>{date}</Text>
-                <View className='flex-row items-center gap-2 lg:mt-2'>
+                <View className='flex-row items-center gap-2 md:mt-2'>
                     <Image
                         className='w-[20px] h-[20px]'
                         source={{ uri: authorImg }}
                     />
                     <Link
-                        className={`${rootClasses.link} lg:mb-1`}
+                        className={`${rootClasses.link} md:mb-1`}
                         href={`https://github.com/${authorBody}`}>
                         {authorBody}
                     </Link>
                 </View>
                 <View className='flex-row items-center gap-1'>
-                    <View className='mt-1 lg:m-0'>
+                    <Link
+                        className={rootClasses.link}
+                        href={tagLink}>
                         <SvgXml
                             xml={`
                             <svg
@@ -147,7 +162,7 @@ export default function Release({
                             </svg>
                             `}
                         />
-                    </View>
+                    </Link>
                     <Link
                         className={rootClasses.link}
                         href={tagLink}>
@@ -162,32 +177,38 @@ export default function Release({
                 } `}>
                 <View className='flex-row gap-2'>
                     <Link
-                        className={`${rootClasses.text} font-black text-4xl p-py px-1`}
+                        className={defaultClasses.releaseTitle}
                         href={titleLink}>
                         {titleText}
                     </Link>
                     {latestLink ? (
                         <Link
-                            className='font-geist text-xs lg:text-base text-green-600 border border-green-600 rounded-md mb-auto p-1'
+                            className='font-geist text-xs md:text-base
+                            text-green-600 dark:text-green-400 hover:text-green-700 hover:dark:text-green-300
+                            border
+                            border-green-600 dark:border-green-800 hover:border-green-900 hover:dark:border-green-700
+                            rounded-md mb-auto p-1'
                             href={latestLink}>
                             Latest
                         </Link>
                     ) : undefined}
                 </View>
                 <Text className={rootClasses.text}>
-                    <Markdown rules={rulesMarkdown}>
+                    <Markdown
+                        rules={rulesMarkdown}
+                        style={stylesMarkdown}
+                        mergeStyle={false}>
                         {changelog ? changelog : ''}
                     </Markdown>
                 </Text>
                 <View className='gap-4 mt-8'>
-                    {/* WIP - Add summary & details tags here. Create Expo Go has some nice examples of how to do this. */}
                     <View className='flex-row gap-1'>
                         <Text
                             className={`${rootClasses.text} font-black text-2xl p-py px-1`}>
                             Assets
                         </Text>
                         <Text
-                            className={`bg-[#e3e3e6] dark:bg-[#696969] font-normal dark:font-semibold ${rootClasses.text} text-xs lg:text-base rounded-md ms-1 mb-auto px-1 p-py`}>
+                            className={`bg-[#e3e3e6] dark:bg-[#696969] font-normal dark:font-semibold ${rootClasses.text} text-xs md:text-base rounded-md ms-1 mb-auto px-1 p-py`}>
                             {downloadableLength}
                         </Text>
                     </View>

@@ -1,14 +1,10 @@
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { ScrollView, View, Text } from 'react-native';
 import { rootClasses, defaultClasses } from '@/app/_layout';
+import { Link } from 'expo-router';
 
 export default function NotFoundScreen() {
-    const router = useRouter();
     const { error } = useLocalSearchParams();
-    const handleOnPress = () =>
-        router.replace({
-            pathname: '(home)'
-        });
 
     return (
         <ScrollView
@@ -34,9 +30,12 @@ export default function NotFoundScreen() {
                         ? error
                         : "The page you're looking for doesn't exist here."}
                 </Text>
-                <TouchableOpacity onPress={handleOnPress}>
-                    <Text className={rootClasses.link}>Return Home</Text>
-                </TouchableOpacity>
+                {/* WORKAROUND - TouchOpacity component and onPress events don't work anymore in latest Expo Go versions in other screens. */}
+                <Link
+                    className={rootClasses.link}
+                    href='(home)'>
+                    Return Home
+                </Link>
             </View>
         </ScrollView>
     );

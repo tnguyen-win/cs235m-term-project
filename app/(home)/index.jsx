@@ -1,17 +1,11 @@
-import { defaultClasses, colors } from '@/app/_layout';
+import { rootClasses, defaultClasses } from '@/app/_layout';
 import { useState, useEffect } from 'react';
 import DummyDataGodot from '@/data/dummy_data_godot.json';
 import DummyDataBabylonJS from '@/data/dummy_data_babylonjs.json';
 import { useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
-import {
-    ScrollView,
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    Switch
-} from 'react-native';
+import { ScrollView, View, Text, TouchableOpacity, Switch } from 'react-native';
+import FormInput from '@/components/FormInput';
 import Release from '@/components/Release';
 
 export default function Home() {
@@ -20,20 +14,12 @@ export default function Home() {
     const mockFetch = false; // INFO - Test fetches by using local JSON files to avoid increasing GitHUB REST API rate limit.
     const mockForms = false; // INFO - Inserts default values for form fields for quick testing.
     const mockReleases = 0; // INFO - Alternate between pretend repositories.
-    const mockFormChangesLogs = true; // Log form field changes.
+    const mockFormChangesLogs = false; // Log form field changes.
     const [formOwner, setFormOwner] = useState(
-        mockFetch || mockForms
-            ? mockReleases === 0
-                ? 'godotengine'
-                : 'babylonjs'
-            : ''
+        mockForms ? (mockReleases === 0 ? 'godotengine' : 'babylonjs') : ''
     );
     const [formRepository, setFormRepository] = useState(
-        mockFetch || mockForms
-            ? mockReleases === 0
-                ? 'godot'
-                : 'babylon.js'
-            : ''
+        mockForms ? (mockReleases === 0 ? 'godot' : 'babylon.js') : ''
     );
     const [jsonData, setJsonData] = useState(null);
     const fetchInit = async () => {
@@ -48,7 +34,7 @@ export default function Home() {
 
             setJsonData(updatedData);
         } catch (error) {
-            console.error(`Fetch Error: ${error}`);
+            console.error('Fetch Error: ', error);
         }
     };
     const router = useRouter();
@@ -61,15 +47,9 @@ export default function Home() {
           )
         : undefined;
 
-    /*
-        WIP - Figure out way to pass theme between _layout.jsx and index.jsx.
-
-        WORKAROUND - Use "setColorScheme" instead of "toggleColorScheme" to avoid possible infinite loop with switch toggle.
-    */
     const handleOnToggle = () =>
         setTheme(getTheme === 'dark' ? 'light' : 'dark');
     const handleOnSubmit = () => {
-        // WIP - Add system to check if offline.
         switch (true) {
             case formOwner === '':
             case formRepository === '':
@@ -82,8 +62,8 @@ export default function Home() {
                     }
                 });
 
-                console.log(`formOwner: ${formOwner}`);
-                console.log(`formRepository: ${formRepository}`);
+                console.log('formOwner: ', formOwner);
+                console.log('formRepository: ', formRepository);
 
                 break;
             case formOwner !== '' && formRepository !== '':
@@ -94,8 +74,8 @@ export default function Home() {
                     }
                 )
                     .then(res =>
-                        res.ok
-                            ? res.json()
+                        res?.ok
+                            ? res?.json()
                             : (() => {
                                   router.push({
                                       pathname: '+not-found',
@@ -108,10 +88,11 @@ export default function Home() {
                                       }
                                   });
 
-                                  console.log(`Response Status: ${res.status}`);
-                                  console.log(`formOwner: ${formOwner}`);
+                                  console.log('Response Status: ', res?.status);
+                                  console.log('formOwner: ', formOwner);
                                   console.log(
-                                      `formRepository: ${formRepository}`
+                                      'formRepository: ',
+                                      formRepository
                                   );
                               })()
                     )
@@ -128,9 +109,9 @@ export default function Home() {
                             }
                         });
 
-                        console.log(`Error: ${err}`);
-                        console.log(`formOwner: ${formOwner}`);
-                        console.log(`formRepository: ${formRepository}`);
+                        console.log('Error: ', err);
+                        console.log('formOwner: ', formOwner);
+                        console.log('formRepository: ', formRepository);
                     });
 
                 break;
@@ -222,24 +203,20 @@ export default function Home() {
 
     useEffect(() => {
         mockFormChangesLogs
-            ? (console.log(formOwner), console.log(formRepository))
+            ? (console.log('FORM: ', formOwner),
+              console.log('FORM: ', formRepository))
             : undefined;
     }, [formOwner, formRepository]);
 
     return (
         // WORKAROUND - Style inheritance doesn't work in Nativewind: https://www.nativewind.dev/guides/troubleshooting#colors-are-not-working
-        <ScrollView className='bg-white dark:bg-[#09090b]'>
-            <View className='container mx-auto px-4 py-32 lg:px-0 lg:py-16 gap-4'>
+        <ScrollView className={rootClasses.backgroundPrimary}>
+            <View className='container mx-auto max-w-4xl px-4 py-16 md:px-0 md:py-16 gap-4'>
                 <Text className={defaultClasses.textTitle}>GH REPLICATE</Text>
                 <TouchableOpacity
                     className='gap-2 ms-auto -m-4 p-4'
                     activeOpacity={0.0}
                     onPress={handleOnToggle}>
-                    {/*
-                        WIP - Convert to use icon.
-
-                        WIP - Figure out how to implement smooth transitions.
-                    */}
                     <Text className={defaultClasses.textTheme}>Dark Theme</Text>
                     <Switch
                         className='ms-auto'
@@ -255,41 +232,18 @@ export default function Home() {
                         value={getTheme === 'dark' ? true : false}
                     />
                 </TouchableOpacity>
-                {/* WIP - Convert form text + input fields to component. */}
-                <View className='gap-2'>
-                    <Text className={defaultClasses.textLabel}>Owner</Text>
-                    <TextInput
-                        className={`${defaultClasses.formInput}`}
-                        keyboardType='url'
-                        onSubmitEditing={handleOnSubmit}
-                        onChangeText={setFormOwner}
-                        value={formOwner}
-                        allowFontScaling={false}
-                        autoCapitalize='none'
-                        autoCorrect={false}
-                        spellCheck={false}
-                        importantForAutofill='no'
-                        placeholder='e.g. godotengine'
-                        placeholderTextColor={colors.gray}
-                    />
-                </View>
-                <View className='gap-2'>
-                    <Text className={defaultClasses.textLabel}>Repository</Text>
-                    <TextInput
-                        className={`${defaultClasses.formInput}`}
-                        keyboardType='url'
-                        onSubmitEditing={handleOnSubmit}
-                        onChangeText={setFormRepository}
-                        value={formRepository}
-                        allowFontScaling={false}
-                        autoCapitalize='none'
-                        autoCorrect={false}
-                        spellCheck={false}
-                        importantForAutofill='no'
-                        placeholder='e.g. godot'
-                        placeholderTextColor={colors.gray}
-                    />
-                </View>
+                <FormInput
+                    textLabel='Owner'
+                    textPlaceholder='e.g. --> "godotengine"'
+                    onChangeText={setFormOwner}
+                    value={formOwner}
+                />
+                <FormInput
+                    textLabel='Repository'
+                    textPlaceholder='e.g. --> "godot"'
+                    onChangeText={setFormRepository}
+                    value={formRepository}
+                />
                 <TouchableOpacity
                     className='bg-[#09090b] dark:bg-white border border-[#09090b] dark:bg-white rounded-md p-2'
                     onPress={handleOnSubmit}>
@@ -299,15 +253,15 @@ export default function Home() {
                 </TouchableOpacity>
                 <View className='mt-8'>
                     {jsonData
-                        ? jsonData.map(res => {
-                              const id = res.id.toString();
+                        ? jsonData.map((res, i) => {
+                              const id = res?.id?.toString();
                               const githubOwner = getWord(
-                                  res.url,
+                                  mockFetch ? res?.url : '',
                                   'repos/',
                                   '/'
                               );
                               const githubRepository = getWord(
-                                  res.url,
+                                  mockFetch ? res?.url : '',
                                   `${githubOwner}/`,
                                   '/'
                               );
@@ -319,24 +273,26 @@ export default function Home() {
                                       key={id}
                                       themedColor={getTheme}
                                       date={calculateElapsedTime(
-                                          res.created_at
+                                          res?.created_at
                                       )}
-                                      authorImg={res.author.avatar_url}
-                                      authorBody={res.author.login}
-                                      tagLink={`https://github.com/${githubOwner}/${githubRepository}/tree/${res.tag_name}`}
-                                      tagBody={res.tag_name}
-                                      titleLink={res.html_url}
-                                      titleText={res.tag_name}
+                                      authorImg={res?.author?.avatar_url}
+                                      authorBody={res?.author?.login}
+                                      tagLink={`https://github.com/${githubOwner}/${githubRepository}/tree/${res?.tag_name}`}
+                                      tagBody={res?.tag_name}
+                                      titleLink={res?.html_url}
+                                      titleText={res?.tag_name}
                                       latestLink={
-                                          id === '1'
+                                          i === 0
                                               ? `https://github.com/${githubOwner}/${githubRepository}/releases/latest`
                                               : undefined
                                       }
-                                      changelog={res.body}
-                                      downloadableLength={res.assets.length + 2}
-                                      downloadableLinks={res.assets}
-                                      downloadAbleZipBall={res.zipball_url}
-                                      downloadAbleTarBall={res.tarball_url}
+                                      changelog={res?.body}
+                                      downloadableLength={
+                                          res?.assets.length + 2
+                                      }
+                                      downloadableLinks={res?.assets}
+                                      downloadAbleZipBall={res?.zipball_url}
+                                      downloadAbleTarBall={res?.tarball_url}
                                   />
                               );
                           })
