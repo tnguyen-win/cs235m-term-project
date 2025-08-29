@@ -11,6 +11,8 @@
         "ios-emulator": "expo start --ios",
         "ios-device": "expo start --localhost --ios",
         "lint": "expo lint",
+        "export": "expo export",
+        "serve": "expo serve",
         "test": "jest --watchAll",
         "reset-project": "node ./scripts/reset-project.js"
     },

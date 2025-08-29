@@ -10,6 +10,8 @@ ECHO 5 - [ ios (emulator) ]
 ECHO 6 - [ ios (device) ]
 ECHO 7 - [ lint ]
 ECHO 8 - [ update dependencies ]
+ECHO 9 - [ expo export ]
+ECHO 0 - [ expo serve ]
 ECHO ----
 
 SET /P input="ENTER: "
@@ -48,6 +50,14 @@ IF %input% == 7 (
 
 IF %input% == 8 (
     CALL npm run update-dependencies
+)
+
+IF %input% == 9 (
+    CALL npm run export
+)
+
+IF %input% == 0 (
+    CALL npm run serve
 )
 
 ECHO ----
