@@ -20,7 +20,6 @@
         "web": {
             "bundler": "metro",
             "output": "static",
-            "publicPath": "/cs235m-term-project/",
             "favicon": "./assets/images/favicon.png"
         },
         "plugins": [
@@ -41,8 +40,10 @@
                 }
             ]
         ],
+        "homepage": "/cs235m-term-project",
         "experiments": {
-            "typedRoutes": true
+            "typedRoutes": true,
+            "baseUrl": "/cs235m-term-project"
         }
     }
 }
